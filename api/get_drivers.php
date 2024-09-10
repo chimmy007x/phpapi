@@ -18,7 +18,8 @@ $password = "8Dbp17sNMq1F";      // รหัสผ่าน vPanel ที่ค
 $dbname = "if0_37282459_db_project";
 
 // เชื่อมต่อฐานข้อมูล
-$conn = new mysqli($servername, $username, $password, $dbname);
+$conn = new mysqli($servername, $username, $password, $dbname, 3306);
+
 
 // ตรวจสอบการเชื่อมต่อ
 if ($conn->connect_error) {
