@@ -7,15 +7,21 @@ ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 
 // การตั้งค่าฐานข้อมูล
+
+$servername = "bg9pkbtnzixeo5bxltsz-mysql.services.clever-cloud.com"; // Host จาก Clever Cloud
+$username = "uekuyjck8be0fvyl"; // User จาก Clever Cloud
+$password = "NylI2V6zJJrezJ2c71pd"; // ใส่รหัสผ่านจาก Clever Cloud ที่แสดงในช่อง Password
+$dbname = "bg9pkbtnzixeo5bxltsz"; // Database Name จาก Clever Cloud
+
 // $servername = "localhost";
 // $username = "root";
 // $password = "";
 // $dbname = "talaicsc";
 
-$servername = "sql200.infinityfree.com";  // MySQL Host Name ที่คุณได้จาก InfinityFree
-$username = "if0_37282459";             // MySQL User Name ที่คุณได้จาก InfinityFree
-$password = "8Dbp17sNMq1F";      // รหัสผ่าน vPanel ที่คุณใช้บน InfinityFree
-$dbname = "if0_37282459_db_project";
+// $servername = "sql200.infinityfree.com";  // MySQL Host Name ที่คุณได้จาก InfinityFree
+// $username = "if0_37282459";             // MySQL User Name ที่คุณได้จาก InfinityFree
+// $password = "8Dbp17sNMq1F";      // รหัสผ่าน vPanel ที่คุณใช้บน InfinityFree
+// $dbname = "if0_37282459_db_project";
 
 // เชื่อมต่อฐานข้อมูล
 $conn = new mysqli($servername, $username, $password, $dbname);
