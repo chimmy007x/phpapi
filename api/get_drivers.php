@@ -24,7 +24,8 @@ $dbname = "bg9pkbtnzixeo5bxltsz"; // Database Name จาก Clever Cloud
 // $dbname = "if0_37282459_db_project";
 
 // เชื่อมต่อฐานข้อมูล
-$conn = new mysqli($servername, $username, $password, $dbname);
+$conn = new mysqli($servername, $username, $password, $dbname, 3306);
+
 
 // ตรวจสอบการเชื่อมต่อ
 if ($conn->connect_error) {
