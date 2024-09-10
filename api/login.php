@@ -5,10 +5,15 @@ ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 
-$servername = "localhost";
-$username = "root";
-$password = "";
-$dbname = "talaicsc";
+// $servername = "localhost";
+// $username = "root";
+// $password = "";
+// $dbname = "talaicsc";
+
+$servername = "sql200.infinityfree.com";  // MySQL Host Name ที่คุณได้จาก InfinityFree
+$username = "if0_37282459";             // MySQL User Name ที่คุณได้จาก InfinityFree
+$password = "8Dbp17sNMq1F";      // รหัสผ่าน vPanel ที่คุณใช้บน InfinityFree
+$dbname = "if0_37282459_db_project";
 
 $conn = new mysqli($servername, $username, $password, $dbname);
 

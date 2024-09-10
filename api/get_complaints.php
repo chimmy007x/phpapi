@@ -2,10 +2,16 @@
 header('Content-Type: application/json');
 
 // การเชื่อมต่อฐานข้อมูล
-$servername = "localhost";
-$username = "root";
-$password = "";
-$dbname = "talaicsc";
+// $servername = "localhost";
+// $username = "root";
+// $password = "";
+// $dbname = "talaicsc";
+
+$servername = "sql200.infinityfree.com";  // MySQL Host Name ที่คุณได้จาก InfinityFree
+$username = "if0_37282459";             // MySQL User Name ที่คุณได้จาก InfinityFree
+$password = "8Dbp17sNMq1F";      // รหัสผ่าน vPanel ที่คุณใช้บน InfinityFree
+$dbname = "if0_37282459_db_project";
+
 $conn = new mysqli($servername, $username, $password, $dbname);
 
 // ตรวจสอบการเชื่อมต่อ
