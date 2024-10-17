@@ -1,64 +1,127 @@
-<?php
+<?php 
 header('Content-Type: application/json');
 
-ini_set('display_errors', 1);
-ini_set('display_startup_errors', 1);
-error_reporting(E_ALL);
+// ปิดการแสดงผลข้อผิดพลาดแบบ HTML
+ini_set('display_errors', 0);
+ini_set('display_startup_errors', 0);
+error_reporting(E_ALL & ~E_NOTICE & ~E_WARNING);
 
-$servername = "bg9pkbtnzixeo5bxltsz-mysql.services.clever-cloud.com"; // Host จาก Clever Cloud
-$username = "uekuyjck8be0fvyl"; // User จาก Clever Cloud
-$password = "NylI2V6zJJrezJ2c71pd"; // ใส่รหัสผ่านจาก Clever Cloud ที่แสดงในช่อง Password
-$dbname = "bg9pkbtnzixeo5bxltsz"; // Database Name จาก Clever Cloud
-
-// $servername = "localhost";
-// $username = "root";
-// $password = "";
-// $dbname = "talaicsc";
-
-// $servername = "sql200.infinityfree.com";  // MySQL Host Name ที่คุณได้จาก InfinityFree
-// $username = "if0_37282459";             // MySQL User Name ที่คุณได้จาก InfinityFree
-// $password = "8Dbp17sNMq1F";      // รหัสผ่าน vPanel ที่คุณใช้บน InfinityFree
-// $dbname = "if0_37282459_db_project";
+$servername = "localhost";
+$username = "root";
+$password = "";
+$dbname = "talaicsc";
 
 $conn = new mysqli($servername, $username, $password, $dbname);
 
+// ตรวจสอบการเชื่อมต่อฐานข้อมูล
 if ($conn->connect_error) {
     die(json_encode(['success' => false, 'message' => 'Database connection failed: ' . $conn->connect_error]));
 }
 
+// รับข้อมูล JSON จาก request body
 $input = json_decode(file_get_contents('php://input'), true);
 $nontri_id = $input['nontri_id'] ?? '';
 $password = $input['password'] ?? '';
 
+// ตรวจสอบว่าได้กรอก Nontri ID และ Password หรือไม่
 if (empty($nontri_id) || empty($password)) {
     echo json_encode(['success' => false, 'message' => 'Nontri ID and Password are required']);
     exit;
 }
 
-$sql = "SELECT * FROM students_personnel WHERE nontri_id = ? AND password = ?";
-$stmt = $conn->prepare($sql);
-$stmt->bind_param("ss", $nontri_id, $password);
-$stmt->execute();
-$result = $stmt->get_result();
+// เรียก API เพื่อตรวจสอบข้อมูล
+$api_url = "https://inv.csc.ku.ac.th/cscapi/ldap/";
+$data = json_encode([
+    'keyapp' => '5d41689157676df689c0081789a8d73f3ef859d93773559f8e570fe1b27217a0',
+    'dataset' => 'ldap',
+    'userid' => $nontri_id,  
+    'pwd' => $password       
+]);
 
-if ($result->num_rows > 0) {
-    $user = $result->fetch_assoc();
+$options = [
+    'http' => [
+        'header'  => "Content-Type: application/json\r\n",
+        'method'  => 'POST',
+        'content' => $data,
+    ],
+];
 
-    // ตรวจสอบว่าตาราง students_personnel มีฟิลด์ number_id หรือไม่
-    $userData = [
-        'fname' => $user['fname'],
-        'lname' => $user['lname'],
-        'status' => $user['status'],
-        'nontri_id' => $user['nontri_id'],
-        // หากไม่มีฟิลด์ number_id ในตารางนี้ ต้องไม่ใส่ค่านี้
-        // 'number_id' => $user['number_id'], 
-    ];
+$context  = stream_context_create($options);
+$response = file_get_contents($api_url, false, $context);
 
-    echo json_encode([
-        'success' => true,
-        'page' => 'UserPage',
-        'user' => $userData
-    ]);
+// ตรวจสอบว่าได้รับข้อมูลจาก API และเป็น JSON
+if ($response === FALSE) {
+    echo json_encode(['success' => false, 'message' => 'Unable to connect to external API']);
+    exit;
+}
+
+$response_data = json_decode($response, true);
+
+// ตรวจสอบว่า API ตอบกลับมาด้วยสถานะที่ถูกต้อง
+if (isset($response_data['status_code']) && $response_data['status_code'] == "1") {
+    // ข้อมูลถูกต้อง ให้เช็คว่า nontri_id มีอยู่ในฐานข้อมูลหรือไม่
+    $sql = "SELECT * FROM students_personnel WHERE nontri_id = ?";
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("s", $nontri_id);
+    $stmt->execute();
+    $result = $stmt->get_result();
+
+    if ($result->num_rows > 0) {
+        // ผู้ใช้มีอยู่ในฐานข้อมูลแล้ว ให้ดำเนินการเข้าสู่ระบบแทน
+        $user = $result->fetch_assoc(); // ดึงข้อมูลผู้ใช้
+
+        // ตรวจสอบรหัสผ่านด้วย password_verify() (ถ้ารหัสผ่านมีอยู่ในฟิลด์)
+        // $input_password ควรเป็นรหัสผ่านที่ผู้ใช้ป้อนเข้ามา
+        if (password_verify($input_password, $user['password'])) {
+            echo json_encode([
+                'success' => true,
+                'page' => 'UserPage',
+                'user' => [
+                    'fname' => $user['fname'],
+                    'lname' => $user['lname'],
+                    'nontri_id' => $user['nontri_id'],
+                    'status' => $user['status']
+                ]
+            ]);
+        } else {
+            echo json_encode(['success' => false, 'message' => 'Invalid password']);
+        }
+    } else {
+        // ข้อมูลไม่อยู่ในฐานข้อมูล ให้บันทึกข้อมูลลงในตาราง
+        $uid = $response_data['data']['uid'];
+        $thainame = $response_data['data']['thainame'];
+        $name_parts = explode(' ', $thainame); // แยก fname และ lname
+        $fname = $name_parts[0];
+        $lname = isset($name_parts[1]) ? $name_parts[1] : ''; // ตรวจสอบหากไม่มี lname
+        $status = $response_data['data']['position'] === null ? 'นิสิต' : 'อาจารย์';
+        $building_id = null;
+        $position_id = null;
+
+        // เข้ารหัสรหัสผ่านก่อนบันทึกลงฐานข้อมูล
+        $password = password_hash($input_password, PASSWORD_DEFAULT);
+
+        // บันทึกข้อมูลลงในตาราง students_personnel
+        $sql = "INSERT INTO students_personnel (nontri_id, password, fname, lname, status, building_id, Position_id) VALUES (?, ?, ?, ?, ?, ?, ?)";
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param("sssssss", $uid, $password, $fname, $lname, $status, $building_id, $position_id);
+
+        if ($stmt->execute()) {
+            // บันทึกข้อมูลสำเร็จ ให้พาผู้ใช้ไปยังหน้า UserPage
+            echo json_encode([
+                'success' => true,
+                'page' => 'UserPage',
+                'user' => [
+                    'fname' => $fname,
+                    'lname' => $lname,
+                    'nontri_id' => $uid,
+                    'status' => $status
+                ]
+            ]);
+        } else {
+            echo json_encode(['success' => false, 'message' => 'Failed to save data']);
+        }
+    }
+ 
 } else {
     // ตรวจสอบในตาราง officer
     $sql = "SELECT * FROM officer WHERE nontri_id = ? AND password = ?";
@@ -90,12 +153,12 @@ if ($result->num_rows > 0) {
                 ],
             ]);
         } else {
-            echo json_encode(['success' => false, 'message' => 'ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง']);
+            echo json_encode(['success' => false, 'message' => 'Invalid Nontri ID or Password']);
         }
     }
 }
 
-
+// ปิดการเชื่อมต่อ
 $stmt->close();
 $conn->close();
 ?>

@@ -1,15 +1,15 @@
 <?php
 header('Content-Type: application/json');
 
-$servername = "bg9pkbtnzixeo5bxltsz-mysql.services.clever-cloud.com"; // Host จาก Clever Cloud
-$username = "uekuyjck8be0fvyl"; // User จาก Clever Cloud
-$password = "NylI2V6zJJrezJ2c71pd"; // ใส่รหัสผ่านจาก Clever Cloud ที่แสดงในช่อง Password
-$dbname = "bg9pkbtnzixeo5bxltsz"; // Database Name จาก Clever Cloud
+// $servername = "bg9pkbtnzixeo5bxltsz-mysql.services.clever-cloud.com"; // Host จาก Clever Cloud
+// $username = "uekuyjck8be0fvyl"; // User จาก Clever Cloud
+// $password = "NylI2V6zJJrezJ2c71pd"; // ใส่รหัสผ่านจาก Clever Cloud ที่แสดงในช่อง Password
+// $dbname = "bg9pkbtnzixeo5bxltsz"; // Database Name จาก Clever Cloud
 
-// $servername = "localhost";
-// $username = "root";
-// $password = "";
-// $dbname = "talaicsc";
+$servername = "localhost";
+$username = "root";
+$password = "";
+$dbname = "talaicsc";
 
 // ข้อมูลการเชื่อมต่อ MySQL บน InfinityFree
 // $servername = "sql200.infinityfree.com";  // MySQL Host Name ที่คุณได้จาก InfinityFree

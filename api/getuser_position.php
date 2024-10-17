@@ -6,16 +6,16 @@ ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 
-$servername = "bg9pkbtnzixeo5bxltsz-mysql.services.clever-cloud.com"; // Host จาก Clever Cloud
-$username = "uekuyjck8be0fvyl"; // User จาก Clever Cloud
-$password = "NylI2V6zJJrezJ2c71pd"; // ใส่รหัสผ่านจาก Clever Cloud ที่แสดงในช่อง Password
-$dbname = "bg9pkbtnzixeo5bxltsz"; // Database Name จาก Clever Cloud
+// $servername = "bg9pkbtnzixeo5bxltsz-mysql.services.clever-cloud.com"; // Host จาก Clever Cloud
+// $username = "uekuyjck8be0fvyl"; // User จาก Clever Cloud
+// $password = "NylI2V6zJJrezJ2c71pd"; // ใส่รหัสผ่านจาก Clever Cloud ที่แสดงในช่อง Password
+// $dbname = "bg9pkbtnzixeo5bxltsz"; // Database Name จาก Clever Cloud
 
 // ข้อมูลเชื่อมต่อฐานข้อมูล
-// $servername = "localhost";
-// $username = "root";
-// $password = "";
-// $dbname = "talaicsc";
+$servername = "localhost";
+$username = "root";
+$password = "";
+$dbname = "talaicsc";
 
 // $servername = "sql200.infinityfree.com";  // MySQL Host Name ที่คุณได้จาก InfinityFree
 // $username = "if0_37282459";             // MySQL User Name ที่คุณได้จาก InfinityFree
@@ -31,7 +31,7 @@ if ($conn->connect_error) {
 }
 
 // SQL query เพื่อดึงข้อมูลตำแหน่งจากตาราง position
-$sql = "SELECT position_id, ST_AsText(location) AS location FROM position";
+$sql = "SELECT position_id, ST_AsText(location) AS location FROM position"; //ใช้ฟังก์ชัน ST_AsText() เพื่อแปลงข้อมูลจากฟิลด์ GEOMETRY มาเป็นข้อความที่เป็นรูปแบบที่อ่านได้ 
 $result = $conn->query($sql);
 
 // ตรวจสอบว่ามีข้อมูลหรือไม่
